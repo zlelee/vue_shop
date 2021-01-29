@@ -15,21 +15,21 @@
         <!-- 侧边栏菜单区域 -->
         <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b">
           <!-- 一级菜单 -->
-          <el-submenu index="1">
+          <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <!-- 一级菜单的模板区域 -->
             <template slot="title">
               <!-- 图标 -->
               <i class="el-icon-location"></i>
               <!-- 文本 -->
-              <span>导航一</span>
+              <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item index="1-4-1">
+            <el-menu-item :index="subItem + ''" v-for="subItem in item.children" :key="subItem">
               <template slot="title">
                 <!-- 图标 -->
                 <i class="el-icon-location"></i>
                 <!-- 文本 -->
-                <span>导航一</span>
+                <span>{{ subItem.authName }}</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -45,13 +45,24 @@
 export default {
   name: 'Home',
   data() {
-    return {}
+    return {
+      menuList: []
+    }
   },
   methods: {
     logout() {
       window.sessionStorage.clear()
       this.$router.push('/login')
+    },
+    async getMenuList() {
+      const { data: res } = await this.$http.get('menus')
+      if (res.meta.status !== 200) return this.$message(res.meta.msg)
+      this.menuList = res.data
+      console.log(this.menuList)
     }
+  },
+  created() {
+    this.getMenuList()
   }
 }
 </script>
