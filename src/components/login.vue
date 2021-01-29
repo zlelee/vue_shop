@@ -17,7 +17,7 @@
         </el-form-item>
         <!-- 按钮 -->
         <el-form-item class="btns">
-          <el-button type="primary">登录</el-button>
+          <el-button type="primary" @click="login('loginFromRef')">登录</el-button>
           <el-button type="info" @click="resetForm('loginFromRef')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -32,7 +32,7 @@ export default {
     return {
       userinfo: {
         username: 'admin',
-        password: '123123'
+        password: '123456'
       },
       loginFormRules: {
         username: [
@@ -49,6 +49,14 @@ export default {
   methods: {
     resetForm(loginFromRef) {
       this.$refs[loginFromRef].resetFields()
+    },
+    login(loginFromRef) {
+      this.$refs[loginFromRef].validate(async (flag) => {
+        if (!flag) return console.log('用户名密码不合法')
+        let { data: res } = await this.$http.post('login', this.userinfo)
+        if (res.meta.status !== 200) return console.log('登录失败')
+        console.log('登录成功')
+      })
     }
   }
 }
