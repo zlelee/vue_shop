@@ -29,10 +29,28 @@ export default {
   name: 'Users',
 
   data() {
-    return {}
+    return {
+      queryObj: {
+        query: '',
+        pagenum: 1,
+        pagesize: 2
+      },
+      userList: []
+    }
   },
 
-  methods: {}
+  methods: {
+    async getUserList() {
+      const { data: res } = await this.$http.get('users', {
+        params: this.queryObj
+      })
+      if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
+      this.userList = res.data.users
+    }
+  },
+  created() {
+    this.getUserList()
+  }
 }
 </script>
 
