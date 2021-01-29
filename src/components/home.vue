@@ -24,7 +24,7 @@
               <span>{{ item.authName }}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem + ''" v-for="subItem in item.children" :key="subItem">
+            <el-menu-item :index="subItem + ''" v-for="subItem in item.children" :key="subItem.id">
               <template slot="title">
                 <!-- 图标 -->
                 <i class="el-icon-location"></i>
@@ -92,5 +92,9 @@ export default {
 }
 .el-main {
   background-color: #eaedf1;
+}
+.el-submenu {
+  text-align: left;
+  padding-left: 20px;
 }
 </style>
