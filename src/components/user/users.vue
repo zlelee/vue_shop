@@ -20,6 +20,19 @@
           <el-button type="primary">添加用户</el-button>
         </el-col>
       </el-row>
+      <el-table :data="userList" style="width: 100%" stripe border>
+        <el-table-column type="index" label="#"></el-table-column>
+        <el-table-column prop="username" label="姓名"> </el-table-column>
+        <el-table-column prop="email" label="邮箱"> </el-table-column>
+        <el-table-column prop="mobile" label="电话"> </el-table-column>
+        <el-table-column prop="role_name" label="角色"> </el-table-column>
+        <el-table-column prop="status" label="状态">
+          <template slot-scope="scope">
+            <el-switch v-model="scope.row.mg_state"> </el-switch>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作"> </el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
@@ -35,7 +48,8 @@ export default {
         pagenum: 1,
         pagesize: 2
       },
-      userList: []
+      userList: [],
+      total: ''
     }
   },
 
@@ -46,6 +60,8 @@ export default {
       })
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       this.userList = res.data.users
+      this.total = res.data.total
+      console.log(this.userList)
     }
   },
   created() {
