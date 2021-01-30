@@ -39,6 +39,7 @@
           </el-tooltip>
         </el-table-column>
       </el-table>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryObj.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryObj.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
   </div>
 </template>
@@ -67,6 +68,14 @@ export default {
       if (res.meta.status !== 200) return this.$message.error(res.meta.msg)
       this.userList = res.data.users
       this.total = res.data.total
+    },
+    handleSizeChange(newSize) {
+      this.queryObj.pagesize = newSize
+      this.getUserList()
+    },
+    handleCurrentChange(newPage) {
+      this.queryObj.pagenum = newPage
+      this.getUserList()
     }
   },
   created() {
@@ -75,4 +84,11 @@ export default {
 }
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.el-table {
+  margin: 15px 0;
+}
+.el-pagination {
+  text-align: left;
+}
+</style>
