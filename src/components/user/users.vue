@@ -28,7 +28,7 @@
         <el-table-column prop="role_name" label="角色"> </el-table-column>
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.mg_state"> </el-switch>
+            <el-switch v-model="scope.row.mg_state" @change="changeMgState(scope.row)"> </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
@@ -56,7 +56,7 @@ export default {
         pagesize: 2
       },
       userList: [],
-      total: ''
+      total: 0
     }
   },
 
@@ -76,6 +76,14 @@ export default {
     handleCurrentChange(newPage) {
       this.queryObj.pagenum = newPage
       this.getUserList()
+    },
+    async changeMgState(userinfo) {
+      const { data: res } = await this.$http.put(`users/${userinfo.id}/state/${userinfo.mg_state}`)
+      if (res.meta.status !== 200) {
+        userinfo.mg_state = !userinfo.mg_state
+        return this.$message.error('更新用户状态失败')
+      }
+      this.$message.success('更新用户状态成功!')
     }
   },
   created() {
