@@ -68,15 +68,15 @@
       </span>
     </el-dialog>
     <!-- 编辑用户对话框 -->
-    <el-dialog title="编辑用户" :visible.sync="editDialogVisible" width="30%">
+    <el-dialog title="编辑用户" :visible.sync="editDialogVisible" width="30%" @close="editFormClose">
       <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="70px">
         <el-form-item label="用户名">
           <el-input v-model="editForm.username" disabled></el-input>
         </el-form-item>
-        <el-form-item label="邮箱">
+        <el-form-item label="邮箱" prop="email">
           <el-input v-model="editForm.email"></el-input>
         </el-form-item>
-        <el-form-item label="手机">
+        <el-form-item label="手机" prop="mobile">
           <el-input v-model="editForm.mobile"></el-input>
         </el-form-item>
       </el-form>
@@ -134,7 +134,16 @@ export default {
         ]
       },
       editForm: {},
-      editFormRules: {},
+      editFormRules: {
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
+        mobile: [
+          { required: true, message: '请输入手机号', trigger: 'blur' },
+          { validator: checkMobile, trigger: 'blur' }
+        ]
+      },
       editDialogVisible: false
     }
   },
@@ -182,6 +191,22 @@ export default {
       const { data: res } = await this.$http.get('users/' + id)
       if (res.meta.status !== 200) return this.$message.error('获取用户信息失败')
       this.editForm = res.data
+    },
+    editFormClose() {
+      this.$refs.editFormRef.resetFields()
+    },
+    editUser() {
+      this.$refs.editFormRef.validate(async (config) => {
+        if (!config) return this.$message.error('请输入合法的信息')
+        const { data: res } = await this.$http.put('users/' + this.editForm.id, {
+          email: this.editForm.email,
+          mobile: this.editForm.mobile
+        })
+        if (res.meta.status !== 200) return this.message.error('更新失败')
+        this.$message.success('更新成功')
+        this.getUserList()
+        this.editDialogVisible = false
+      })
     }
   },
   created() {
