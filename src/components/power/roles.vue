@@ -24,8 +24,16 @@ export default {
       rolesList: []
     }
   },
-  created() {},
-  methods: {}
+  created() {
+    this.getRolesList()
+  },
+  methods: {
+    async getRolesList() {
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status !== 200) return this.$message.error('获取角色数据列表失败')
+      this.rolesList = res.data
+    }
+  }
 }
 </script>
 
