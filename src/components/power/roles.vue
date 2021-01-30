@@ -11,6 +11,19 @@
           <el-button type="primary">添加角色</el-button>
         </el-col>
       </el-row>
+      <el-table :data="rolesList" style="width: 100%" stripe border>
+        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="index" label="#"></el-table-column>
+        <el-table-column prop="roleName" label="角色名称"> </el-table-column>
+        <el-table-column prop="roleDesc" label="角色描述"> </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button type="primary" size="small" icon="el-icon-edit">编辑</el-button>
+            <el-button type="danger" size="small" icon="el-icon-delete">删除</el-button>
+            <el-button type="warning" size="small" icon="el-icon-setting">分配权限</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
