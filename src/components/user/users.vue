@@ -32,12 +32,14 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="180px">
-          <template>
-            <!-- 编辑按钮 -->
-            <el-button type="primary" icon="el-icon-edit" size="mini" @click="editClick()"></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
-            <el-tooltip effect="dark" content="用户管理" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+          <template slot-scope="scope">
+            <!-- 修改 -->
+            <el-button type="primary" size="mini" icon="el-icon-edit" @click="editClick(scope.row.id)"></el-button>
+            <!-- 删除 -->
+            <el-button type="danger" size="mini" icon="el-icon-delete"></el-button>
+            <!-- 分配角色 -->
+            <el-tooltip effect="dark" content="分配角色" placement="top" :enterable="false">
+              <el-button type="warning" size="mini" icon="el-icon-setting"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -169,8 +171,11 @@ export default {
         this.getUserList()
       })
     },
-    editClick() {
+    async editClick(id) {
       this.editDialogVisible = true
+      const { data: res } = await this.$http.get('users/' + id)
+      if (res.meta.status !== 200) return this.$message.error('获取用户信息失败')
+      this.editForm = res.data
     }
   },
   created() {
