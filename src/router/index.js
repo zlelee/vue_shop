@@ -5,6 +5,7 @@ import home from '../components/home.vue'
 import welcome from '../components/welcome.vue'
 import users from '../components/user/users.vue'
 import rights from '../components/power/rights.vue'
+import roles from '../components/power/roles.vue'
 //注册路由组件
 Vue.use(VueRouter)
 
@@ -18,7 +19,8 @@ const routes = [
     children: [
       { path: '/welcome', component: welcome },
       { path: '/users', component: users },
-      { path: '/rights', component: rights }
+      { path: '/rights', component: rights },
+      { path: '/roles', component: roles }
     ]
   }
 ]
