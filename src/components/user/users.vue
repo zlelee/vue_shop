@@ -65,6 +65,20 @@
 </template>
 
 <script>
+const checkEmail = (rule, value, cb) => {
+  const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-]+)+$/
+  if (regEmail.test(value)) {
+    return cb()
+  }
+  return cb('请输入合法的邮箱')
+}
+const checkMobile = (rule, value, cb) => {
+  const regMobile = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+  if (regMobile.test(value)) {
+    return cb()
+  }
+  return cb('请输入合法的手机号')
+}
 export default {
   name: 'Users',
 
@@ -93,10 +107,13 @@ export default {
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }
         ],
-        email: [{ required: true, message: '请输入邮箱', trigger: 'blur' }],
+        email: [
+          { required: true, message: '请输入邮箱', trigger: 'blur' },
+          { validator: checkEmail, trigger: 'blur' }
+        ],
         mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
-          { min: 11, max: 11, message: '请输入11位数字的手机号', trigger: 'blur' }
+          { validator: checkMobile, trigger: 'blur' }
         ]
       }
     }
