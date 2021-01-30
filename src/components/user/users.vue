@@ -41,7 +41,7 @@
       </el-table>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryObj.pagenum" :page-sizes="[1, 2, 5, 10]" :page-size="queryObj.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
-    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="30%">
+    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="30%" @close="addFormClose">
       <el-form :model="addForm" :rules="addFormrules" ref="addFormRef" label-width="70px" class="demo-ruleForm">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="addForm.username"></el-input>
@@ -65,24 +65,17 @@
 </template>
 
 <script>
-const checkEmail = (rule, value, cb) => {
-  const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-]+)+$/
-  if (regEmail.test(value)) {
-    return cb()
-  }
-  return cb('请输入合法的邮箱')
-}
-const checkMobile = (rule, value, cb) => {
-  const regMobile = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
-  if (regMobile.test(value)) {
-    return cb()
-  }
-  return cb('请输入合法的手机号')
-}
 export default {
   name: 'Users',
-
   data() {
+    const checkEmail = (rule, value, cb) => {
+      const regEmail = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-]+)+$/
+      regEmail.test(value) ? cb() : cb('请输入合法的邮箱')
+    }
+    const checkMobile = (rule, value, cb) => {
+      const regMobile = /^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/
+      regMobile.test(value) ? cb() : cb('请输入合法的手机号')
+    }
     return {
       queryObj: {
         query: '',
@@ -143,6 +136,9 @@ export default {
         return this.$message.error('更新用户状态失败')
       }
       this.$message.success('更新用户状态成功!')
+    },
+    addFormClose() {
+      this.$refs.addFormRef.resetFields()
     }
   },
   created() {
