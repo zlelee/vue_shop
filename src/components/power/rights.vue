@@ -5,6 +5,16 @@
       <el-breadcrumb-item><a href="/">权限管理</a></el-breadcrumb-item>
       <el-breadcrumb-item>权限列表</el-breadcrumb-item>
     </el-breadcrumb>
+    <el-card>
+      <template>
+        <el-table :data="rightsList" style="width: 100%" stripe border>
+          <el-table-column type="index" prop="#"></el-table-column>
+          <el-table-column prop="authName" label="权限名称"> </el-table-column>
+          <el-table-column prop="path" label="路径"> </el-table-column>
+          <el-table-column prop="level" label="权限等级"> </el-table-column>
+        </el-table>
+      </template>
+    </el-card>
   </div>
 </template>
 
@@ -23,6 +33,7 @@ export default {
       const { data: res } = await this.$http.get('rights/list')
       if (res.meta.status !== 200) return this.$message.error('获取权限列表数据失败')
       this.rightsList = res.data
+      console.log(this.rightsList)
     }
   },
   created() {
