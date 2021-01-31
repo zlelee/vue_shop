@@ -16,3 +16,11 @@ body,
 body .el-table th.gutter {
   display: table-cell !important;
 }
+
+/* 解决 cascader Bug */
+.el-cascader-panel {
+  height: 200px;
+}
+.el-scrollbar__wrap {
+  overflow-x: hidden;
+}

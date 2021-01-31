@@ -35,12 +35,15 @@
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[3, 5, 10, 15]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
     <!-- 添加分类对话框 -->
-    <el-dialog title="添加分类" :visible.sync="addFormdialogVisible" width="50%">
+    <el-dialog title="添加分类" :visible.sync="addFormdialogVisible" width="50%" @close="addFormdialogClose">
       <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px" class="demo-ruleForm">
         <el-form-item label="分类名称" prop="cat_name">
           <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
-        
+        <el-form-item label="父级分类" prop="cat_name">
+          <el-cascader v-model="selectedKeys" :options="parentCateList" :props="cascaderProps" @change="parentCateChanged"></el-cascader>
+        </el-form-item>
+      </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addFormdialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addFormdialogVisible = false">确 定</el-button>
@@ -94,7 +97,16 @@ export default {
       },
       //父级分类列表
       parentCateList: [],
-      
+      // 指定级联选择器的配置对象
+      cascaderProps: {
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children',
+        expandTrigger: 'hover',
+        checkStrictly: true
+      },
+      // 选中的父级分类的 ID 数组
+      selectedKeys: []
     }
   },
   created() {
@@ -130,6 +142,10 @@ export default {
       })
       if (res.meta.status !== 200) return this.$message.error('获取分类列表失败')
       this.parentCateList = res.data
+    },
+    parentCateChanged() {},
+    addFormdialogClose() {
+      this.$refs.addCateFormRef.resetFields()
     }
   }
 }
@@ -137,6 +153,9 @@ export default {
 
 <style lang="less" scoped>
 .zk-table {
-  margin-top: 20px;
+  margin: 20px;
+}
+.el-cascader {
+  width: 100%;
 }
 </style>
