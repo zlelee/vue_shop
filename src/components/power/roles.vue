@@ -47,7 +47,8 @@
     </el-card>
     <!-- 分配权限对话框 -->
     <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
-      <span>这是一段信息</span>
+      <!-- 树形控件 -->
+      <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRightDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
@@ -63,7 +64,12 @@ export default {
   data() {
     return {
       rolesList: [],
-      setRightDialogVisible: false
+      setRightDialogVisible: false,
+      rightsList: [],
+      treeProps: {
+        children: 'children',
+        label: 'authName'
+      }
     }
   },
   created() {
@@ -86,7 +92,10 @@ export default {
       if (res.meta.status !== 200) return this.$$message.error('删除权限失败')
       role.children = res.data
     },
-    setRights() {
+    async setRights() {
+      const { data: res } = await this.$http.get('rights/tree')
+      if (res.meta.status !== 200) return this.$message.error('获取权限列表失败')
+      this.rightsList = res.data
       this.setRightDialogVisible = true
     }
   }
