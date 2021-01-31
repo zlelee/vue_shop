@@ -10,7 +10,7 @@
     <el-card>
       <el-row>
         <el-col>
-          <el-button type="primary">添加分类</el-button>
+          <el-button type="primary" @click="showAddFormDialog">添加分类</el-button>
         </el-col>
       </el-row>
       <!-- 表格区域 -->
@@ -34,6 +34,18 @@
       </tree-table>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[3, 5, 10, 15]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
+    <!-- 添加分类对话框 -->
+    <el-dialog title="添加分类" :visible.sync="addFormdialogVisible" width="50%">
+      <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="分类名称" prop="name">
+          <el-input v-model="addCateForm.name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addFormdialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addFormdialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -70,7 +82,10 @@ export default {
           type: 'template',
           template: 'opt'
         }
-      ]
+      ],
+      addFormdialogVisible: false,
+      addCateForm: {},
+      addCateFormRules: {}
     }
   },
   created() {
@@ -92,6 +107,9 @@ export default {
     handleCurrentChange(newPageNum) {
       this.queryInfo.pagenum = newPageNum
       this.getCateList()
+    },
+    showAddFormDialog() {
+      this.addFormdialogVisible = true
     }
   }
 }
