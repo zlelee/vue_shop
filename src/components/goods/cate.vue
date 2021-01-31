@@ -24,6 +24,7 @@
           <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
         </template>
       </tree-table>
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[3, 5, 10, 15]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
   </div>
 </template>
@@ -70,6 +71,14 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取分类失败')
       this.catelist = res.data.result
       this.total = res.data.total
+    },
+    handleSizeChange(newPageSize) {
+      this.queryInfo.pagesize = newPageSize
+      this.getCateList()
+    },
+    handleCurrentChange(newPageNum) {
+      this.queryInfo.pagenum = newPageNum
+      this.getCateList()
     }
   }
 }
