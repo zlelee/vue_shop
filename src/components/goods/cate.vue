@@ -10,9 +10,10 @@
     <el-card>
       <el-row>
         <el-col>
-          <el-button type="primary">添加分类</el-button>
+          <el-button type="primary" @click="getCateList">添加分类</el-button>
         </el-col>
       </el-row>
+      <el-row> </el-row>
       <!-- 表格区域 -->
       <!-- 分页区域 -->
     </el-card>
@@ -24,10 +25,25 @@ export default {
   name: '',
 
   data() {
-    return {}
+    return {
+      queryInfo: {
+        type: 3,
+        pagenum: 1,
+        pagesize: 5
+      },
+      cateList: []
+    }
   },
 
-  methods: {}
+  methods: {
+    async getCateList() {
+      const { data: res } = await this.$http.get('categories', {
+        params: this.queryInfo
+      })
+      if (res.meta.status !== 200) return this.$message.error('获取分类失败')
+      this.cateList = res.data
+    }
+  }
 }
 </script>
 
