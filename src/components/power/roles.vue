@@ -40,11 +40,19 @@
           <template slot-scope="scope">
             <el-button type="primary" size="small" icon="el-icon-edit">编辑</el-button>
             <el-button type="danger" size="small" icon="el-icon-delete">删除</el-button>
-            <el-button type="warning" size="small" icon="el-icon-setting">分配权限</el-button>
+            <el-button type="warning" size="small" icon="el-icon-setting" @click="setRights">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
+    <!-- 分配权限对话框 -->
+    <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
+      <span>这是一段信息</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRightDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -54,7 +62,8 @@ export default {
 
   data() {
     return {
-      rolesList: []
+      rolesList: [],
+      setRightDialogVisible: false
     }
   },
   created() {
@@ -76,6 +85,9 @@ export default {
       const { data: res } = await this.$http.delete(`roles/${role.id}/rights/${itemId}`)
       if (res.meta.status !== 200) return this.$$message.error('删除权限失败')
       role.children = res.data
+    },
+    setRights() {
+      this.setRightDialogVisible = true
     }
   }
 }
