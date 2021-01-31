@@ -48,10 +48,10 @@
     <!-- 分配权限对话框 -->
     <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%" @close="closeRightDialog">
       <!-- 树形控件 -->
-      <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKey"></el-tree>
+      <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys" ref="treeRef"></el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="setRightDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="setRightDialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="allotRights">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -70,7 +70,7 @@ export default {
         children: 'children',
         label: 'authName'
       },
-      defKey: []
+      defKeys: []
     }
   },
   created() {
@@ -90,26 +90,39 @@ export default {
       }).catch((err) => err)
       if (confirmResult === 'cancle') return this.$message.info('已取消删除')
       const { data: res } = await this.$http.delete(`roles/${role.id}/rights/${itemId}`)
-      if (res.meta.status !== 200) return this.$$message.error('删除权限失败')
+      if (res.meta.status !== 200) return this.$message.error('删除权限失败')
       role.children = res.data
     },
     async setRights(role) {
+      this.roleId = role.id
       const { data: res } = await this.$http.get('rights/tree')
       if (res.meta.status !== 200) return this.$message.error('获取权限列表失败')
       this.rightsList = res.data
-      this.getLeafKeys(role, this.defKey)
+      this.getLeafKeys(role, this.defKeys)
       this.setRightDialogVisible = true
     },
     getLeafKeys(node, arr) {
       if (!node.children) {
         return arr.push(node.id)
       }
-      node.children.forEach((item) => {
-        this.getLeafKeys(item, arr)
-      })
+      node.children.forEach((item) => this.getLeafKeys(item, arr))
     },
     closeRightDialog() {
-      this.defKey = []
+      this.defKeys = []
+    },
+    async allotRights() {
+      const keys = [...this.$refs.treeRef.getCheckedKeys(), ...this.$refs.treeRef.getHalfCheckedKeys()]
+      const idStr = keys.join()
+      const { data: res } = await this.$http.post(`roles/${this.roleId}/rights`, {
+        rids: idStr
+      })
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配权限失败')
+      }
+      this.$message.success('分配权限成功')
+      // 重新渲染整个角色列表
+      this.getRolesList()
+      this.setRightDialogVisible = false
     }
   }
 }
