@@ -40,13 +40,13 @@
           <template slot-scope="scope">
             <el-button type="primary" size="small" icon="el-icon-edit">编辑</el-button>
             <el-button type="danger" size="small" icon="el-icon-delete">删除</el-button>
-            <el-button type="warning" size="small" icon="el-icon-setting" @click="setRights">分配权限</el-button>
+            <el-button type="warning" size="small" icon="el-icon-setting" @click="setRights(scope.row)">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
     <!-- 分配权限对话框 -->
-    <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%">
+    <el-dialog title="分配权限" :visible.sync="setRightDialogVisible" width="50%" @close="closeRightDialog">
       <!-- 树形控件 -->
       <el-tree :data="rightsList" :props="treeProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKey"></el-tree>
       <span slot="footer" class="dialog-footer">
@@ -93,18 +93,23 @@ export default {
       if (res.meta.status !== 200) return this.$$message.error('删除权限失败')
       role.children = res.data
     },
-    async setRights() {
+    async setRights(role) {
       const { data: res } = await this.$http.get('rights/tree')
       if (res.meta.status !== 200) return this.$message.error('获取权限列表失败')
       this.rightsList = res.data
-      // this.rightsList.forEach((item) => {
-      //   item.children.forEach((item) => {
-      //     console.log(item.id)
-      //     this.defKey.push(item.id)
-      //   })
-      // })
-      // console.log(this.defKey)
+      this.getLeafKeys(role, this.defKey)
       this.setRightDialogVisible = true
+    },
+    getLeafKeys(node, arr) {
+      if (!node.children) {
+        return arr.push(node.id)
+      }
+      node.children.forEach((item) => {
+        this.getLeafKeys(item, arr)
+      })
+    },
+    closeRightDialog() {
+      this.defKey = []
     }
   }
 }
