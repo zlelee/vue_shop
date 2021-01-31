@@ -12,7 +12,17 @@
         </el-col>
       </el-row>
       <el-table :data="rolesList" style="width: 100%" stripe border>
-        <el-table-column type="expand"></el-table-column>
+        <el-table-column type="expand">
+          <template slot-scope="scope">
+            <el-row v-for="(item1, i1) in scope.row.children" :key="item1.id">
+              <el-col :span="5" :class="['bdbottom', i1 === 0 ? 'bdtop' : '']">
+                <el-tag> {{ item1.authName }}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <el-col :span="19"></el-col>
+            </el-row>
+          </template>
+        </el-table-column>
         <el-table-column type="index" label="#"></el-table-column>
         <el-table-column prop="roleName" label="角色名称"> </el-table-column>
         <el-table-column prop="roleDesc" label="角色描述"> </el-table-column>
@@ -55,6 +65,15 @@ export default {
   text-align: left;
 }
 .el-table {
+  margin: 20px 0;
+}
+.bdtop {
+  border-top: 1px solid #eee;
+}
+.bdbottom {
+  border-bottom: 1px solid #eee;
+}
+.el-tag {
   margin: 20px 0;
 }
 </style>
