@@ -36,11 +36,11 @@
     </el-card>
     <!-- 添加分类对话框 -->
     <el-dialog title="添加分类" :visible.sync="addFormdialogVisible" width="50%">
-      <el-form :model="parentCateList" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="分类名称" prop="name">
-          <el-input v-model="addCateForm.name"></el-input>
+      <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="分类名称" prop="cat_name">
+          <el-input v-model="addCateForm.cat_name"></el-input>
         </el-form-item>
-      </el-form>
+        
       <span slot="footer" class="dialog-footer">
         <el-button @click="addFormdialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addFormdialogVisible = false">确 定</el-button>
@@ -84,10 +84,17 @@ export default {
         }
       ],
       addFormdialogVisible: false,
-      addCateForm: {},
-      addCateFormRules: {},
+      addCateForm: {
+        cat_name: '',
+        cat_pid: 0,
+        cat_level: 0
+      },
+      addCateFormRules: {
+        cat_name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }]
+      },
       //父级分类列表
-      parentCateList: []
+      parentCateList: [],
+      
     }
   },
   created() {
