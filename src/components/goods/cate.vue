@@ -36,7 +36,7 @@
     </el-card>
     <!-- 添加分类对话框 -->
     <el-dialog title="添加分类" :visible.sync="addFormdialogVisible" width="50%">
-      <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px" class="demo-ruleForm">
+      <el-form :model="parentCateList" :rules="addCateFormRules" ref="addCateFormRef" label-width="100px" class="demo-ruleForm">
         <el-form-item label="分类名称" prop="name">
           <el-input v-model="addCateForm.name"></el-input>
         </el-form-item>
@@ -85,7 +85,9 @@ export default {
       ],
       addFormdialogVisible: false,
       addCateForm: {},
-      addCateFormRules: {}
+      addCateFormRules: {},
+      //父级分类列表
+      parentCateList: []
     }
   },
   created() {
@@ -108,8 +110,19 @@ export default {
       this.queryInfo.pagenum = newPageNum
       this.getCateList()
     },
+    //点击添加对话框
     showAddFormDialog() {
+      this.getParentCateList()
       this.addFormdialogVisible = true
+    },
+    async getParentCateList() {
+      const { data: res } = await this.$http.get('categories', {
+        params: {
+          type: 2
+        }
+      })
+      if (res.meta.status !== 200) return this.$message.error('获取分类列表失败')
+      this.parentCateList = res.data
     }
   }
 }
