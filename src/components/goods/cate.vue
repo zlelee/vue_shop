@@ -15,10 +15,18 @@
       </el-row>
       <!-- 表格区域 -->
       <tree-table :expand-type="false" :data="catelist" :columns="columns" :selection-type="false" show-index index-text="#" border :show-row-hover="false">
+        <!-- 是否有效列 -->
         <template slot="isok" slot-scope="scope">
           <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color: lightgreen;"></i>
           <i class="el-icon-error" v-else style="color: red;"></i>
         </template>
+        <!-- 等级列 -->
+        <template slot="level" slot-scope="scope">
+          <el-tag size="small" v-if="scope.row.cat_level === 0">一级</el-tag>
+          <el-tag type="success" size="small" v-else-if="scope.row.cat_level === 1">二级</el-tag>
+          <el-tag type="warning" size="small" v-else>三级</el-tag>
+        </template>
+        <!-- 操作列 -->
         <template slot-scope="scope" slot="opt">
           <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
           <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
@@ -51,6 +59,11 @@ export default {
           label: '是否有效',
           type: 'template',
           template: 'isok'
+        },
+        {
+          label: '等级',
+          type: 'template',
+          template: 'level'
         },
         {
           label: '操作',
