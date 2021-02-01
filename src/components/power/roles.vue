@@ -38,8 +38,8 @@
         <el-table-column prop="roleDesc" label="角色描述"> </el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="primary" size="small" icon="el-icon-edit">编辑</el-button>
-            <el-button type="danger" size="small" icon="el-icon-delete">删除</el-button>
+            <el-button type="primary" size="small" icon="el-icon-edit" @click="showEditRoles(scope.row.id)">编辑</el-button>
+            <el-button type="danger" size="small" icon="el-icon-delete" @click="deleteRoles">删除</el-button>
             <el-button type="warning" size="small" icon="el-icon-setting" @click="setRights(scope.row)">分配权限</el-button>
           </template>
         </el-table-column>
@@ -55,8 +55,7 @@
       </span>
     </el-dialog>
     <!-- 添加角色对话框 -->
-
-    <el-dialog title="添加角色" :visible.sync="addRolesDialogVisible" width="50%">
+    <el-dialog title="添加角色" :visible.sync="addRolesDialogVisible" width="50%" @close="closeAddForm">
       <!-- 添加角色表单 -->
       <el-form :model="addRolesForm" :rules="addRolesFormRules" ref="addRolesFormRef" label-width="100px">
         <el-form-item label="角色名称" prop="roleName">
@@ -71,13 +70,27 @@
         <el-button type="primary" @click="addRoles">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 编辑角色对话框 -->
+    <el-dialog title="编辑角色" :visible.sync="editRolseDialogVisible" width="50%" @close="closeEditDialog">
+      <el-form :model="editRolesForm" :rules="editRolesFormRules" ref="editRolesFormRef" label-width="100px">
+        <el-form-item label="角色名称" prop="roleName">
+          <el-input v-model="editRolesForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述" prop="roleDesc">
+          <el-input v-model="editRolesForm.roleDesc"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editRolseDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editRoles">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
   name: 'roles',
-
   data() {
     return {
       rolesList: [],
@@ -96,7 +109,14 @@ export default {
       addRolesFormRules: {
         roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
         roleDesc: [{ required: true, message: '请输入角色描述', trigger: 'blur' }]
-      }
+      },
+      editRolseDialogVisible: false,
+      editRolesForm: {},
+      editRolesFormRules: {
+        roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
+        roleDesc: [{ required: true, message: '请输入角色描述', trigger: 'blur' }]
+      },
+      roleId: ''
     }
   },
   created() {
@@ -164,6 +184,32 @@ export default {
       this.$message.success('添加角色成功')
       this.addRolesDialogVisible = false
       this.getRolesList()
+    },
+    //监听关闭添加表单事件
+    closeAddForm() {
+      this.$refs.addRolesFormRef.resetFields()
+    },
+    //点击编辑
+    async showEditRoles(id) {
+      const { data: res } = await this.$http.get('roles/' + id)
+      if (res.meta.status !== 200) return this.$message.error('获取数据失败')
+      this.editRolesForm = res.data
+      this.roleId = id
+      this.editRolseDialogVisible = true
+    },
+    editRoles() {
+      this.$refs.editRolesFormRef.validate(async (config) => {
+        if (!config) return this.$message.error('请输入合法的信息')
+        const { data: res } = await this.$http.put('roles/' + this.roleId, this.editRolesForm)
+        if (res.meta.status !== 200) return this.$message.error('编辑角色失败')
+        this.$message.success('编辑成功!')
+        this.getRolesList()
+        this.editRolseDialogVisible = false
+      })
+    },
+    //监听编辑对话框关闭事件
+    closeEditDialog() {
+      this.$refs.editRolesFormRef.resetFields()
     }
   }
 }
