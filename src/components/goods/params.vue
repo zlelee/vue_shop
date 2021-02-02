@@ -125,15 +125,18 @@ export default {
     addParamsClose() {
       this.$refs.addFormRef.resetFields()
     },
-    async addParams() {
-      const { data: res } = await this.$http.post(`categories/${this.cateId}/attributes`, {
-        attr_name: this.addForm.attr_name,
-        attr_sel: this.activeName
+    addParams() {
+      this.$refs.addFormRef.validate(async (valid) => {
+        if (!valid) return this.$message.error('请输入正确的参数')
+        const { data: res } = await this.$http.post(`categories/${this.cateId}/attributes`, {
+          attr_name: this.addForm.attr_name,
+          attr_sel: this.activeName
+        })
+        if (res.meta.status !== 201) return this.$message.error('添加参数失败')
+        this.$message.success('添加参数成功')
+        this.getParamsDate()
+        this.addParamsDialogVisible = false
       })
-      if (res.meta.status !== 201) return this.$message.error('添加参数失败')
-      this.$message.success('添加参数成功')
-      this.getParamsDate()
-      this.addParamsDialogVisible = false
     }
   },
   computed: {
