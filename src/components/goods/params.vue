@@ -18,9 +18,33 @@
       <el-tabs v-model="activeName" @tab-click="tabChangeClick">
         <el-tab-pane label="动态参数" name="many">
           <el-button type="primary" :disabled="isDisabled">添加参数</el-button>
+          <!-- 动态参数表格 -->
+          <el-table :data="manyTableData" style="width: 100%" stripe border>
+            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="index" label="#"> </el-table-column>
+            <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-tab-pane>
         <el-tab-pane label="静态属性" name="only">
           <el-button type="primary" :disabled="isDisabled">添加属性</el-button>
+          <!-- 静态属性表格 -->
+          <el-table :data="onlyTableData" style="width: 100%" stripe border>
+            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="index" label="#"> </el-table-column>
+            <el-table-column prop="attr_name" label="属性名称"> </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </el-tab-pane>
       </el-tabs>
     </el-card>
@@ -41,7 +65,9 @@ export default {
         expandTrigger: 'hover'
       },
       selectedCateKeys: [],
-      activeName: 'many'
+      activeName: 'many',
+      manyTableData: [],
+      onlyTableData: []
     }
   },
   created() {
@@ -53,7 +79,13 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取分类数据失败')
       this.catelist = res.data
     },
-    async parentCateChanged() {
+    parentCateChanged() {
+      this.getCateData()
+    },
+    tabChangeClick() {
+      this.getCateData()
+    },
+    async getCateData() {
       if (this.selectedCateKeys.length !== 3) {
         this.selectedCateKeys = []
         return
@@ -64,9 +96,12 @@ export default {
         }
       })
       if (res.meta.status !== 200) return this.$message.error('获取参数列表失败')
-      console.log(res.data)
-    },
-    tabChangeClick() {}
+      if (this.activeName === 'many') {
+        this.manyTableData = res.data
+      } else {
+        this.onlyTableData = res.data
+      }
+    }
   },
   computed: {
     isDisabled() {
@@ -87,5 +122,8 @@ export default {
   span {
     margin-right: 20px;
   }
+}
+.el-table {
+  margin: 20px 0;
 }
 </style>
