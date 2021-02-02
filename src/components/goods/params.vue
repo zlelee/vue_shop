@@ -26,7 +26,7 @@
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.attr_id)">编辑</el-button>
-                <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteParams(scope.row.attr_id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -41,7 +41,7 @@
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.attr_id)">编辑</el-button>
-                <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteParams(scope.row.attr_id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -176,6 +176,18 @@ export default {
         this.getParamsDate()
         this.editParamsDialogVisible = false
       })
+    },
+    async deleteParams(attr_id) {
+      const result = await this.$confirm('此操作将永久删除该参数, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch((err) => err)
+      if (result === 'cancle') return this.$message.info('取消了删除')
+      const { data: res } = await this.$http.delete(`categories/${this.cateId}/attributes/${attr_id}`)
+      if (res.meta.status !== 200) return this.$message.error('删除参数失败')
+      this.$message.success('删除参数成功')
+      this.getParamsDate()
     }
   },
   computed: {
