@@ -46,7 +46,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addFormdialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addFormdialogVisible = false">确 定</el-button>
+        <el-button type="primary" @click="addCate">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -143,9 +143,31 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取分类列表失败')
       this.parentCateList = res.data
     },
-    parentCateChanged() {},
+    parentCateChanged() {
+      if (this.selectedKeys.length > 0) {
+        this.addCateForm.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
+        this.addCateForm.cat_level = this.selectedKeys.length
+      } else {
+        this.addCateForm.cat_pid = 0
+        this.addCateForm.cat_level = 0
+      }
+    },
     addFormdialogClose() {
       this.$refs.addCateFormRef.resetFields()
+      this.selectedKeys = []
+      this.addCateForm.cat_pid = 0
+      this.addCateForm.cat_level = 0
+    },
+    //点击按钮,添加商品分类
+    addCate() {
+      this.$refs.addCateFormRef.validate(async (valid) => {
+        if (!valid) return
+        const { data: res } = await this.$http.post('categories', this.addCateForm)
+        if (res.meta.status !== 201) return this.$message.error('添加分类失败')
+        this.$message.success('添加分类成功')
+        this.getCateList()
+        this.addFormdialogVisible = false
+      })
     }
   }
 }
