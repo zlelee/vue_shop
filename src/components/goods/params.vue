@@ -20,7 +20,11 @@
           <el-button type="primary" :disabled="isDisabled" @click="addParamsDialogVisible = true">添加参数</el-button>
           <!-- 动态参数表格 -->
           <el-table :data="manyTableData" style="width: 100%" stripe border>
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
@@ -35,7 +39,11 @@
           <el-button type="primary" :disabled="isDisabled" @click="addParamsDialogVisible = true">添加属性</el-button>
           <!-- 静态属性表格 -->
           <el-table :data="onlyTableData" style="width: 100%" stripe border>
-            <el-table-column type="expand"></el-table-column>
+            <el-table-column type="expand">
+              <template slot-scope="scope">
+                <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
             <el-table-column prop="attr_name" label="属性名称"> </el-table-column>
             <el-table-column label="操作">
@@ -132,6 +140,9 @@ export default {
           sel: this.activeName
         }
       })
+      res.data.forEach((item) => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : item.attr_vals
+      })
       if (res.meta.status !== 200) return this.$message.error('获取参数列表失败')
       if (this.activeName === 'many') {
         this.manyTableData = res.data
@@ -169,7 +180,8 @@ export default {
         if (!valid) return this.$message.error('请输入合法的参数信息')
         const { data: res } = await this.$http.put(`categories/${this.cateId}/attributes/${this.editForm.attr_id}`, {
           attr_name: this.editForm.attr_name,
-          attr_sel: this.activeName
+          attr_sel: this.activeName,
+          attr_vals: this.editForm.attr_vals
         })
         if (res.meta.status !== 200) return this.$message.error('修改参数失败')
         this.$message.success('修改参数成功')
@@ -216,5 +228,8 @@ export default {
 }
 .el-table {
   margin: 20px 0;
+}
+.el-tag {
+  margin: 15px;
 }
 </style>
