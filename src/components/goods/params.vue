@@ -25,7 +25,7 @@
             <el-table-column prop="attr_name" label="参数名称"> </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.attr_id)">编辑</el-button>
                 <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
               </template>
             </el-table-column>
@@ -40,7 +40,7 @@
             <el-table-column prop="attr_name" label="属性名称"> </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" type="primary" icon="el-icon-edit">编辑</el-button>
+                <el-button size="mini" type="primary" icon="el-icon-edit" @click="showEditDialog(scope.row.attr_id)">编辑</el-button>
                 <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
               </template>
             </el-table-column>
@@ -58,6 +58,18 @@
       <span slot="footer" class="dialog-footer">
         <el-button @click="addParamsDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addParams">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 编辑参数对话框 -->
+    <el-dialog :title="'添加' + titleText" :visible.sync="editParamsDialogVisible" width="50%" @close="editParamsClose">
+      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px">
+        <el-form-item :label="titleText" prop="attr_name">
+          <el-input v-model="editForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editParamsDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="editParams">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -85,6 +97,11 @@ export default {
         attr_name: ''
       },
       addFormRules: {
+        attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
+      },
+      editParamsDialogVisible: false,
+      editForm: {},
+      editFormRules: {
         attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
       }
     }
@@ -136,6 +153,28 @@ export default {
         this.$message.success('添加参数成功')
         this.getParamsDate()
         this.addParamsDialogVisible = false
+      })
+    },
+    editParamsClose() {
+      this.$refs.editFormRef.resetFields()
+    },
+    async showEditDialog(attrId) {
+      const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes/${attrId}`)
+      if (res.meta.status !== 200) return this.$message.error('获取参数信息失败')
+      this.editForm = res.data
+      this.editParamsDialogVisible = true
+    },
+    editParams() {
+      this.$refs.editFormRef.validate(async (valid) => {
+        if (!valid) return this.$message.error('请输入合法的参数信息')
+        const { data: res } = await this.$http.put(`categories/${this.cateId}/attributes/${this.editForm.attr_id}`, {
+          attr_name: this.editForm.attr_name,
+          attr_sel: this.activeName
+        })
+        if (res.meta.status !== 200) return this.$message.error('修改参数失败')
+        this.$message.success('修改参数成功')
+        this.getParamsDate()
+        this.editParamsDialogVisible = false
       })
     }
   },
