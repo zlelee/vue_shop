@@ -17,7 +17,7 @@
       </el-row>
       <el-tabs v-model="activeName" @tab-click="tabChangeClick">
         <el-tab-pane label="动态参数" name="many">
-          <el-button type="primary" :disabled="isDisabled">添加参数</el-button>
+          <el-button type="primary" :disabled="isDisabled" @click="addParamsDialogVisible = true">添加参数</el-button>
           <!-- 动态参数表格 -->
           <el-table :data="manyTableData" style="width: 100%" stripe border>
             <el-table-column type="expand"></el-table-column>
@@ -32,7 +32,7 @@
           </el-table>
         </el-tab-pane>
         <el-tab-pane label="静态属性" name="only">
-          <el-button type="primary" :disabled="isDisabled">添加属性</el-button>
+          <el-button type="primary" :disabled="isDisabled" @click="addParamsDialogVisible = true">添加属性</el-button>
           <!-- 静态属性表格 -->
           <el-table :data="onlyTableData" style="width: 100%" stripe border>
             <el-table-column type="expand"></el-table-column>
@@ -48,6 +48,18 @@
         </el-tab-pane>
       </el-tabs>
     </el-card>
+    <!-- 添加参数对话框 -->
+    <el-dialog :title="'添加' + titleText" :visible.sync="addParamsDialogVisible" width="50%" @close="addParamsClose">
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
+        <el-form-item :label="titleText" prop="attr_name">
+          <el-input v-model="addForm.attr_name"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addParamsDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addParamsDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -67,7 +79,14 @@ export default {
       selectedCateKeys: [],
       activeName: 'many',
       manyTableData: [],
-      onlyTableData: []
+      onlyTableData: [],
+      addParamsDialogVisible: false,
+      addForm: {
+        attr_name: ''
+      },
+      addFormRules: {
+        attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
+      }
     }
   },
   created() {
@@ -80,12 +99,13 @@ export default {
       this.catelist = res.data
     },
     parentCateChanged() {
-      this.getCateData()
+      this.getParamsDate()
     },
     tabChangeClick() {
-      this.getCateData()
+      this.getParamsDate()
     },
-    async getCateData() {
+    //获取参数的数据
+    async getParamsDate() {
       if (this.selectedCateKeys.length !== 3) {
         this.selectedCateKeys = []
         return
@@ -101,6 +121,9 @@ export default {
       } else {
         this.onlyTableData = res.data
       }
+    },
+    addParamsClose() {
+      this.$refs.addFormRef.resetFields()
     }
   },
   computed: {
@@ -111,6 +134,10 @@ export default {
       if (this.selectedCateKeys.length === 3) {
         return this.selectedCateKeys[2]
       }
+    },
+    titleText() {
+      const title = this.activeName === 'many' ? '动态参数' : '静态属性'
+      return title
     }
   }
 }
