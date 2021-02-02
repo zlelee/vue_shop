@@ -23,10 +23,20 @@ export default {
   name: '',
 
   data() {
-    return {}
+    return {
+      catelist: []
+    }
   },
-
-  methods: {}
+  created() {
+    this.getCateList()
+  },
+  methods: {
+    async getCateList() {
+      const { data: res } = await this.$http.get('categories')
+      if (res.meta.status !== 200) return this.$message.error('获取分类数据失败')
+      this.catelist = res.data
+    }
+  }
 }
 </script>
 
