@@ -23,6 +23,8 @@
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"> </el-input>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
               </template>
             </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
@@ -42,6 +44,8 @@
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"> </el-input>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
               </template>
             </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
@@ -111,7 +115,9 @@ export default {
       editForm: {},
       editFormRules: {
         attr_name: [{ required: true, message: '请输入参数名称', trigger: 'blur' }]
-      }
+      },
+      inputVisible: false,
+      inputValue: ''
     }
   },
   created() {
@@ -142,6 +148,8 @@ export default {
       })
       res.data.forEach((item) => {
         item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : item.attr_vals
+        item.inputVisible = false
+        item.inputValue = ''
       })
       if (res.meta.status !== 200) return this.$message.error('获取参数列表失败')
       if (this.activeName === 'many') {
@@ -200,6 +208,12 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('删除参数失败')
       this.$message.success('删除参数成功')
       this.getParamsDate()
+    },
+    handleInputConfirm() {
+      this.inputVisible = false
+    },
+    showInput(row) {
+      row.inputVisible = true
     }
   },
   computed: {
@@ -231,5 +245,8 @@ export default {
 }
 .el-tag {
   margin: 15px;
+}
+.el-input {
+  width: 120px;
 }
 </style>
