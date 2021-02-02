@@ -23,7 +23,7 @@
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
-                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"> </el-input>
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
                 <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
               </template>
             </el-table-column>
@@ -44,7 +44,7 @@
             <el-table-column type="expand">
               <template slot-scope="scope">
                 <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
-                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm" @blur="handleInputConfirm"> </el-input>
+                <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
                 <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
               </template>
             </el-table-column>
@@ -209,11 +209,29 @@ export default {
       this.$message.success('删除参数成功')
       this.getParamsDate()
     },
-    handleInputConfirm() {
-      this.inputVisible = false
+    async handleInputConfirm(row) {
+      if (row.inputValue.trim().length === 0) {
+        return (row.inputValue = '')
+      }
+      const r = JSON.parse(JSON.stringify(row.attr_vals))
+      console.log(r)
+      r.push(row.inputValue)
+      const { data: res } = await this.$http.put(`categories/${this.cateId}/attributes/${row.attr_id}`, {
+        attr_name: row.attr_name,
+        attr_sel: row.attr_sel,
+        attr_vals: r.join(' ')
+      })
+      if (res.meta.status !== 200) return this.$message.error('提交参数失败')
+      this.$message.success('提交参数成功')
+      row.attr_vals.push(row.inputValue)
+      row.inputValue = ''
+      row.inputVisible = false
     },
     showInput(row) {
       row.inputVisible = true
+      this.$nextTick(() => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
     }
   },
   computed: {
