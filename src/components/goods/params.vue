@@ -45,7 +45,7 @@
               <template slot-scope="scope">
                 <el-tag v-for="(item, i) in scope.row.attr_vals" :key="i" closable>{{ item }}</el-tag>
                 <el-input class="input-new-tag" v-if="scope.row.inputVisible" v-model="scope.row.inputValue" ref="saveTagInput" size="small" @keyup.enter.native="handleInputConfirm(scope.row)" @blur="handleInputConfirm(scope.row)"> </el-input>
-                <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+                <el-button v-else class="button-new-tag" size="small" @click="showInput(scope.row)">+ New Tag</el-button>
               </template>
             </el-table-column>
             <el-table-column type="index" label="#"> </el-table-column>
@@ -139,6 +139,8 @@ export default {
     async getParamsDate() {
       if (this.selectedCateKeys.length !== 3) {
         this.selectedCateKeys = []
+        this.manyTableData = []
+        this.onlyTableData = []
         return
       }
       const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, {
@@ -147,7 +149,7 @@ export default {
         }
       })
       res.data.forEach((item) => {
-        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : item.attr_vals
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
         item.inputVisible = false
         item.inputValue = ''
       })
@@ -214,7 +216,6 @@ export default {
         return (row.inputValue = '')
       }
       const r = JSON.parse(JSON.stringify(row.attr_vals))
-      console.log(r)
       r.push(row.inputValue)
       const { data: res } = await this.$http.put(`categories/${this.cateId}/attributes/${row.attr_id}`, {
         attr_name: row.attr_name,
