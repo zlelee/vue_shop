@@ -15,6 +15,10 @@
           <el-cascader v-model="selectedCateKeys" :options="catelist" :props="cateListProps" @change="parentCateChanged"></el-cascader>
         </el-col>
       </el-row>
+      <el-tabs v-model="activeName" @tab-click="tabChangeClick">
+        <el-tab-pane label="动态参数" name="first">动态参数</el-tab-pane>
+        <el-tab-pane label="静态属性" name="second">静态属性</el-tab-pane>
+      </el-tabs>
     </el-card>
   </div>
 </template>
@@ -32,7 +36,8 @@ export default {
         children: 'children',
         expandTrigger: 'hover'
       },
-      selectedCateKeys: []
+      selectedCateKeys: [],
+      activeName: 'first'
     }
   },
   created() {
@@ -44,7 +49,13 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取分类数据失败')
       this.catelist = res.data
     },
-    parentCateChanged() {}
+    parentCateChanged() {
+      if (this.selectedCateKeys.length !== 3) {
+        this.selectedCateKeys = []
+        return
+      }
+    },
+    tabChangeClick() {}
   }
 }
 </script>
