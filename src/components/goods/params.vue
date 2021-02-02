@@ -16,10 +16,10 @@
         </el-col>
       </el-row>
       <el-tabs v-model="activeName" @tab-click="tabChangeClick">
-        <el-tab-pane label="动态参数" name="first">
+        <el-tab-pane label="动态参数" name="many">
           <el-button type="primary" :disabled="isDisabled">添加参数</el-button>
         </el-tab-pane>
-        <el-tab-pane label="静态属性" name="second">
+        <el-tab-pane label="静态属性" name="only">
           <el-button type="primary" :disabled="isDisabled">添加属性</el-button>
         </el-tab-pane>
       </el-tabs>
@@ -41,7 +41,7 @@ export default {
         expandTrigger: 'hover'
       },
       selectedCateKeys: [],
-      activeName: 'first'
+      activeName: 'many'
     }
   },
   created() {
@@ -53,17 +53,29 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('获取分类数据失败')
       this.catelist = res.data
     },
-    parentCateChanged() {
+    async parentCateChanged() {
       if (this.selectedCateKeys.length !== 3) {
         this.selectedCateKeys = []
         return
       }
+      const { data: res } = await this.$http.get(`categories/${this.cateId}/attributes`, {
+        params: {
+          sel: this.activeName
+        }
+      })
+      if (res.meta.status !== 200) return this.$message.error('获取参数列表失败')
+      console.log(res.data)
     },
     tabChangeClick() {}
   },
   computed: {
     isDisabled() {
       return this.selectedCateKeys.length !== 3
+    },
+    cateId() {
+      if (this.selectedCateKeys.length === 3) {
+        return this.selectedCateKeys[2]
+      }
     }
   }
 }
