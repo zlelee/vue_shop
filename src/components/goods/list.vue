@@ -15,7 +15,7 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary">添加商品</el-button>
+          <el-button type="primary" @click="goAddGoods">添加商品</el-button>
         </el-col>
       </el-row>
       <el-table :data="goodslist" border stripe>
@@ -88,6 +88,9 @@ export default {
       if (res.meta.status !== 200) return this.$message.error('删除商品失败')
       this.$message.success('删除商品成功')
       this.getGoodsList()
+    },
+    goAddGoods() {
+      this.$router.push({ path: 'goods/add' })
     }
   }
 }
