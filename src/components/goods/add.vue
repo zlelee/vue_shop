@@ -63,7 +63,7 @@
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
             <quill-editor ref="myQuillEditor" v-model="addForm.goods_introduce" />
-            <el-button type="primary">添加商品</el-button>
+            <el-button type="primary" @click="addGoods">添加商品</el-button>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -76,6 +76,7 @@
 </template>
 
 <script>
+import _ from 'lodash'
 export default {
   name: 'add',
   data() {
@@ -89,7 +90,8 @@ export default {
         goods_cat: [],
         // 图片的数组
         pics: [],
-        goods_introduce: ''
+        goods_introduce: '',
+        attrs:[]
       },
       addFormRules: {
         goods_name: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
@@ -157,9 +159,6 @@ export default {
           }
         })
         if (res.meta.status !== 200) return this.$message.error('获取参数列表数据失败')
-        res.data.forEach((item) => {
-          item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
-        })
         this.onlyTableData = res.data
       }
     },
@@ -184,6 +183,34 @@ export default {
         pic: response.data.tmp_path
       }
       this.addForm.pics.push(picInfo)
+    },
+    addGoods() {
+      this.$refs.addFormRef.validate(async valid=>{
+        if(!valid) return this.$message.error('请填写必要的信息')
+        //添加动态参数
+        this.manyTableData.forEach(item=>{
+          const newInfo = {
+            "attr_id": item.attr_id,
+            "attr_value": item.attr_vals.join(' ')
+          }
+          this.addForm.attrs.push(newInfo)
+        })
+        // console.log(this.manyTableData);
+        //添加静态属性
+        this.onlyTableData.forEach(item=>{
+          const newInfo = {
+            "attr_id": item.attr_id,
+            "attr_value": item.attr_vals
+          }
+          this.addForm.attrs.push(newInfo)
+        })
+        const form = _.cloneDeep(this.addForm)
+        form.goods_cat = form.goods_cat.join(',')
+        const { data: res} = await this.$http.post('goods',form)
+        if(res.meta.status!==201) return this.$message.error('添加商品失败')
+        this.$message.success('添加商品成功')
+        this.$router.push('/goods')
+      })
     }
   },
   computed: {

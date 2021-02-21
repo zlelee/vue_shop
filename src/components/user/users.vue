@@ -170,6 +170,7 @@ export default {
   },
 
   methods: {
+    //获取用户列表
     async getUserList() {
       const { data: res } = await this.$http.get('users', {
         params: this.queryObj
