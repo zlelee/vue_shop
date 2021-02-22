@@ -11,7 +11,8 @@ import './assets/fonts/iconfont.css'
 import TreeTable from 'vue-table-with-tree-grid'
 //富文本编辑器
 import VueQuillEditor from 'vue-quill-editor'
-
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 import 'quill/dist/quill.core.css' // import styles
 import 'quill/dist/quill.snow.css' // for snow theme
 import 'quill/dist/quill.bubble.css' // for bubble theme
@@ -22,9 +23,11 @@ import axios from 'axios'
 axios.defaults.baseURL = `http://127.0.0.1:8888/api/private/v1/`
 axios.interceptors.request.use((config) => {
   config.headers.Authorization = window.sessionStorage.getItem('token')
+  NProgress.start()
   return config
 })
 axios.interceptors.response.use((response) => {
+  NProgress.done()
   if (response.data.meta.msg == '无效token' && response.data.meta.status == 400) {
     window.location.href = '#/login'
   }
