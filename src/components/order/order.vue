@@ -31,17 +31,32 @@
         </el-table-column>
         <el-table-column label="操作">
           <template>
-            <el-button size="mini" type="primary" icon="el-icon-edit"></el-button>
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="showAddressDialog"></el-button>
             <el-button size="mini" type="success" icon="el-icon-location"></el-button>
           </template>
         </el-table-column>
       </el-table>
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="queryInfo.pagenum" :page-sizes="[3, 5, 10, 20]" :page-size="queryInfo.pagesize" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </el-card>
+    <el-dialog title="修改地址" :visible.sync="addressDialogVisible" width="30%" @close="closeAddressDialog">
+      <el-form :model="addressForm" :rules="addressFormRules" ref="addressFormRef" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="省市区/县" prop="address1">
+          <el-cascader v-model="addressForm.address1" :options="cityDada" :props="{ expandTrigger: 'hover' }"></el-cascader>
+        </el-form-item>
+        <el-form-item label="详细地址" prop="address2">
+          <el-input v-model="addressForm.address2"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="addressDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addressDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import cityDada from './citydata'
 export default {
   name: '',
 
@@ -53,7 +68,17 @@ export default {
         pagesize: 10,
         pagenum: 1
       },
-      total: 0
+      total: 0,
+      addressDialogVisible: false,
+      addressForm: {
+        address1: [],
+        address2: ''
+      },
+      addressFormRules: {
+        address1: [{ required: true, message: '请选择省市区/县', trigger: 'blur' }],
+        address2: [{ required: true, message: '请填写详细地址', trigger: 'blur' }]
+      },
+      cityDada
     }
   },
   created() {
@@ -75,6 +100,13 @@ export default {
     handleCurrentChange(newNum) {
       this.queryInfo.pagenum = newNum
       this.getOrderList()
+    },
+    showAddressDialog() {
+      this.addressDialogVisible = true
+    },
+    closeAddressDialog() {
+      this.addressDialogVisible = false
+      this.$refs.addressFormRef.resetFields()
     }
   }
 }
@@ -83,5 +115,8 @@ export default {
 <style lang="less" scoped>
 .el-table {
   margin: 30px 0;
+}
+.el-cascader {
+  width: 100%;
 }
 </style>
